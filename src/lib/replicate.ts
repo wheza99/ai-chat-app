@@ -1,8 +1,16 @@
 import Replicate from 'replicate';
 
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
-});
+// Lazy initialization to avoid build-time errors
+let replicateInstance: Replicate | null = null;
+
+function getReplicate(): Replicate {
+  if (!replicateInstance) {
+    replicateInstance = new Replicate({
+      auth: process.env.REPLICATE_API_TOKEN || 'placeholder-token',
+    });
+  }
+  return replicateInstance;
+}
 
 // PrunaAI p-image model for image generation
 const IMAGE_MODEL = 'prunaai/p-image';
@@ -11,7 +19,7 @@ export async function generateImage(prompt: string): Promise<{ image_url: string
   try {
     console.log('Generating image with prompt:', prompt);
     
-    const output = await replicate.run(
+    const output = await getReplicate().run(
       IMAGE_MODEL,
       {
         input: {
@@ -46,4 +54,4 @@ export async function generateImage(prompt: string): Promise<{ image_url: string
   }
 }
 
-export default replicate;
+export default getReplicate();

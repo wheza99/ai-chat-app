@@ -1,9 +1,17 @@
 import OpenAI from 'openai';
 
-const groqClient = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: 'https://api.groq.com/openai/v1',
-});
+// Lazy initialization to avoid build-time errors
+let groqClient: OpenAI | null = null;
+
+function getGroqClient(): OpenAI {
+  if (!groqClient) {
+    groqClient = new OpenAI({
+      apiKey: process.env.GROQ_API_KEY || 'placeholder-key',
+      baseURL: 'https://api.groq.com/openai/v1',
+    });
+  }
+  return groqClient;
+}
 
 export const MODEL = 'llama-3.3-70b-versatile';
 
@@ -74,7 +82,8 @@ export async function createChatCompletion(
   messages: Array<{ role: string; content: string; tool_calls?: any[]; tool_call_id?: string }>,
   useTools: boolean = true
 ) {
-  const response = await groqClient.chat.completions.create({
+  const client = getGroqClient();
+  const response = await client.chat.completions.create({
     model: MODEL,
     messages: messages as any,
     tools: useTools ? tools : undefined,
@@ -90,7 +99,8 @@ export async function streamChatCompletion(
   messages: Array<{ role: string; content: string }>,
   onChunk: (chunk: string) => void
 ) {
-  const stream = await groqClient.chat.completions.create({
+  const client = getGroqClient();
+  const stream = await client.chat.completions.create({
     model: MODEL,
     messages: messages as any,
     temperature: 0.7,
@@ -106,4 +116,4 @@ export async function streamChatCompletion(
   }
 }
 
-export default groqClient;
+export default getGroqClient();

@@ -1,9 +1,17 @@
 import { ApifyClient } from 'apify-client';
 import type { InstagramPost, InstagramScraperResult } from '@/types';
 
-const apifyClient = new ApifyClient({
-  token: process.env.APIFY_API_TOKEN,
-});
+// Lazy initialization to avoid build-time errors
+let apifyClientInstance: ApifyClient | null = null;
+
+function getApifyClient(): ApifyClient {
+  if (!apifyClientInstance) {
+    apifyClientInstance = new ApifyClient({
+      token: process.env.APIFY_API_TOKEN || 'placeholder-token',
+    });
+  }
+  return apifyClientInstance;
+}
 
 // Instagram Scraper Actor ID
 const INSTAGRAM_SCRAPER_ACTOR = 'apify/instagram-scraper';
@@ -14,6 +22,8 @@ export async function scrapeInstagramPopular(
 ): Promise<InstagramScraperResult> {
   try {
     console.log('Scraping Instagram for:', query);
+    
+    const client = getApifyClient();
     
     // Determine if it's a hashtag or username
     const isHashtag = query.startsWith('#');
@@ -33,10 +43,10 @@ export async function scrapeInstagramPopular(
     }
 
     // Run the Actor and wait for it to finish
-    const run = await apifyClient.actor(INSTAGRAM_SCRAPER_ACTOR).call(input);
+    const run = await client.actor(INSTAGRAM_SCRAPER_ACTOR).call(input);
 
     // Fetch results from the dataset
-    const { items } = await apifyClient.dataset(run.defaultDatasetId).listItems();
+    const { items } = await client.dataset(run.defaultDatasetId).listItems();
     
     const posts: InstagramPost[] = items.slice(0, limit).map((item: any) => ({
       id: item.id || '',
@@ -61,4 +71,4 @@ export async function scrapeInstagramPopular(
   }
 }
 
-export default apifyClient;
+export default getApifyClient();
