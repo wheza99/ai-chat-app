@@ -1,36 +1,136 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Chat App
 
-## Getting Started
+A modern AI chat application built with Next.js, featuring:
 
-First, run the development server:
+- 🤖 **AI Chat** powered by Groq (Llama 3.3 70B)
+- 🎨 **Image Generation** using Replicate (PrunaAI p-image)
+- 📸 **Instagram Integration** via Apify Instagram Scraper
+- 🔐 **Authentication** with Supabase Auth
+- 💾 **Persistent Chat History** stored in Supabase PostgreSQL
+- 🎯 **Tool Calling** - AI can use tools to generate images, scrape Instagram, and more
+
+## Features
+
+### AI Chat with Tools
+The AI assistant can:
+- **Generate images** - "Generate an image of a sunset over mountains"
+- **Search Instagram** - "Search Instagram for #nature photography"
+- **Replicate Instagram content** - "Find popular posts about food and create AI variations"
+
+### Authentication
+- Email/Password signup and signin
+- Secure session management with Supabase
+
+### Chat Management
+- Create multiple chat sessions
+- Chat history persistence
+- Delete chats
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **UI Components**: shadcn/ui, Tailwind CSS
+- **AI**: Groq API (Llama 3.3 70B)
+- **Image Generation**: Replicate (PrunaAI p-image)
+- **Web Scraping**: Apify (Instagram Scraper)
+- **Backend**: Supabase (Auth, Database)
+
+## Setup
+
+### 1. Clone and Install
+
+```bash
+npm install
+```
+
+### 2. Set up Supabase
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. Run the SQL schema in `supabase/schema.sql` in the SQL Editor
+3. Copy your project URL and anon key
+
+### 3. Get API Keys
+
+- **Groq**: [console.groq.com](https://console.groq.com)
+- **Replicate**: [replicate.com](https://replicate.com/account/api-tokens)
+- **Apify**: [console.apify.com](https://console.apify.com/account#/integrations)
+
+### 4. Environment Variables
+
+Copy `.env.local` and fill in your keys:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+GROQ_API_KEY=your_groq_api_key
+REPLICATE_API_TOKEN=your_replicate_api_token
+APIFY_API_TOKEN=your_apify_api_token
+```
+
+### 5. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage Examples
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Generate an Image
+```
+User: Generate an image of a cyberpunk city at night
+AI: [Uses generate_image tool] Here's your cyberpunk city!
+```
 
-## Learn More
+### Search Instagram
+```
+User: Search Instagram for #sunset posts
+AI: [Uses scrape_instagram_popular tool] I found these popular sunset posts...
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Replicate Instagram Content
+```
+User: Find popular food posts and create an AI version
+AI: [Uses both tools] Here's an AI-generated version inspired by the popular food post!
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── auth/route.ts      # Auth endpoints
+│   │   ├── chat/route.ts      # Chat endpoints
+│   │   └── chats/route.ts     # Chat management
+│   ├── layout.tsx
+│   └── page.tsx               # Main page
+├── components/
+│   ├── auth/                  # Auth components
+│   ├── chat/                  # Chat UI components
+│   └── tools/                 # Tool result components
+│   └── ui/                    # shadcn/ui components
+├── lib/
+│   ├── apify.ts              # Apify Instagram scraper
+│   ├── groq.ts               # Groq AI client
+│   ├── replicate.ts          # Replicate image generation
+│   └── supabase.ts           # Supabase client
+└── types/
+    └── index.ts              # TypeScript types
+```
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Deploy to Vercel
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm i -g vercel
+vercel
+```
+
+Make sure to set all environment variables in Vercel dashboard.
+
+## License
+
+MIT
